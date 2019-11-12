@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
 import './App.css'
 import SearchPage from './SearchPage'
 import { Route } from 'react-router-dom'
@@ -10,13 +9,27 @@ class BooksApp extends Component {
   state = {
     books: []
   };
+
+  // Get Data
   componentDidMount() {
-    BooksAPI.getAll().then(result => {
-      this.setState({
-        books: result
-      });
-    });
+    this.updateBooks();
   };
+
+  //Update shelf
+  updateShelf = (book, shelf) => {
+    BooksAPI.update(book, shelf).then(() => {
+      this.updateBooks()
+    })
+  }
+  
+ //Update books in state
+  updateBooks = () => {
+    BooksAPI.getAll().then(data => {
+      this.setState({
+        books: data
+      })
+    });    
+  }
     render() {
         return (
         <div className="App">
@@ -24,16 +37,19 @@ class BooksApp extends Component {
           exact
           path="/"
           render={() => (
-            <MainPage
+          <MainPage
               books={this.state.books}
+              updateShelf = {this.updateShelf}
             />
           )}
-        />
-        <Route path="/search" render={() => (
+          />
+          <Route path="/search" render={() => (
           <SearchPage
             books={this.state.books}
+            updateShelf = {this.updateShelf}
           />
-        )}/>
+          )}
+          />
         </div>
         );
     };
